@@ -6,10 +6,26 @@ import (
 	"fmt"
 )
 
-func (a Kube) SetImage(image string) error {
-	res, err := a.Request("PATCH", &Request{
-		Url:  a.Conf.DeploymentUrl(),
-		Body: bytes.NewBuffer([]byte(fmt.Sprintf(`[{"op": "replace", "path": "/spec/template/spec/containers/%d/image", "value": "%s"}]`, a.Conf.Container, image))),
+type Workload struct {
+	kube      Kube
+	Namespace string
+	Workload  string
+}
+
+func (a Workload) DeploymentUrl() string {
+	return fmt.Sprintf(
+		"%s/k8s/clusters/%s/apis/apps/v1/namespaces/%s/deployments/%s",
+		a.kube.Conf.Backend,
+		a.kube.Conf.Cluster,
+		a.Namespace,
+		a.Workload,
+	)
+}
+
+func (a Workload) SetImage(image string) error {
+	res, err := a.kube.Request("PATCH", &Request{
+		Url:  a.DeploymentUrl(),
+		Body: bytes.NewBuffer([]byte(fmt.Sprintf(`[{"op": "replace", "path": "/spec/template/spec/containers/%d/image", "value": "%s"}]`, a.kube.Conf.Container, image))),
 	})
 	if err != nil {
 		return err
@@ -18,9 +34,9 @@ func (a Kube) SetImage(image string) error {
 	return nil
 }
 
-func (a Kube) DeploymentFullAvailable() (bool, error) {
-	res, err := a.Request("GET", &Request{
-		Url: a.Conf.DeploymentUrl(),
+func (a Workload) DeploymentFullAvailable() (bool, error) {
+	res, err := a.kube.Request("GET", &Request{
+		Url: a.DeploymentUrl(),
 	})
 	if err != nil {
 		return false, err

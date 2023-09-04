@@ -2,11 +2,12 @@ package config
 
 import (
 	"errors"
+	"github.com/MultiMx/K8sQuickUpdateAction/pkg/kube"
 	"gopkg.in/yaml.v3"
 	"unsafe"
 )
 
-var K8s []K8sConf
+var K8s []kube.Config
 
 func initK8sCreds() error {
 	k8sBytes := unsafe.Slice(unsafe.StringData(Env.K8s), len(Env.K8s))
@@ -19,9 +20,4 @@ func initK8sCreds() error {
 		return errors.New("invalid empty K8s Creds")
 	}
 	return nil
-}
-
-type K8sConf struct {
-	Backend string `yaml:"backend"`
-	Token   string `yaml:"token"`
 }

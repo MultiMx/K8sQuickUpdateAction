@@ -11,10 +11,15 @@ func New(conf *Config) *Kube {
 	if conf.Cluster == "" {
 		conf.Cluster = "local"
 	}
-	if conf.Type == "" {
-		conf.Type = "deployments"
-	}
 	return &Kube{
 		Conf: conf,
+	}
+}
+
+func (a Kube) NewWorkload(namespace, workload string) Workload {
+	return Workload{
+		kube:      a,
+		Namespace: namespace,
+		Workload:  workload,
 	}
 }
