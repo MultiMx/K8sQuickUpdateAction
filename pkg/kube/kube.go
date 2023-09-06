@@ -7,12 +7,13 @@ type Kube struct {
 	Conf *Config
 }
 
-func New(conf *Config) *Kube {
+func New(name string, conf *Config) Kube {
 	conf.Backend = strings.TrimSuffix(conf.Backend, "/")
 	if conf.Cluster == "" {
 		conf.Cluster = "local"
 	}
-	return &Kube{
+	return Kube{
+		Name: name,
 		Conf: conf,
 	}
 }

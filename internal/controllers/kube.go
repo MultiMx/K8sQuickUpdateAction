@@ -19,11 +19,11 @@ type DeployWorkChain struct {
 }
 
 func UpdateWorkloads() {
-	var apis = make([]*kube.Kube, len(config.K8s))
+	var apis = make([]kube.Kube, len(config.K8s))
 	i := 0
 	for name, conf := range config.K8s {
-		apis[i] = kube.New(&conf)
-		apis[i].Name = name
+		conf := conf
+		apis[i] = kube.New(name, &conf)
 		i++
 	}
 
