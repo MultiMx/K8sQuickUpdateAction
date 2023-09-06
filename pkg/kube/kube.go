@@ -3,6 +3,7 @@ package kube
 import "strings"
 
 type Kube struct {
+	Name string
 	Conf *Config
 }
 

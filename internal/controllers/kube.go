@@ -20,8 +20,11 @@ type DeployWorkChain struct {
 
 func UpdateWorkloads() {
 	var apis = make([]*kube.Kube, len(config.K8s))
-	for i, conf := range config.K8s {
+	i := 0
+	for name, conf := range config.K8s {
 		apis[i] = kube.New(&conf)
+		apis[i].Name = name
+		i++
 	}
 
 	var errCount atomic.Uint32
@@ -33,14 +36,15 @@ func UpdateWorkloads() {
 		var chain *DeployWorkChain
 		for namespace, workloads := range step {
 			for workload, conf := range workloads {
-				for _, api := range apis {
+				for _, kubeApi := range apis {
 					wg.Add(1)
-					operator := api.NewWorkload(namespace, workload)
+					operator := kubeApi.NewWorkload(namespace, workload)
 					var deployWork = DeployWorkChain{
 						Prev: chain,
 						F: func() {
 							defer wg.Done()
 							logger := slog.With(
+								slog.String("kube", kubeApi.Name),
 								slog.String("namespace", operator.Namespace),
 								slog.String("workload", operator.Workload),
 							)

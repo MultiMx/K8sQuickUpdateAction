@@ -7,7 +7,7 @@ import (
 	"unsafe"
 )
 
-var K8s []kube.Config
+var K8s map[string]kube.Config
 
 func initK8sCreds() error {
 	k8sBytes := unsafe.Slice(unsafe.StringData(Env.K8s), len(Env.K8s))
