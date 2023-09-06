@@ -59,8 +59,8 @@ func UpdateWorkloads() {
 									}
 									return err
 								},
-								MaxRetryDelay: 0,
-								MaxRetry:      0,
+								MaxRetryDelay: time.Second * 5,
+								MaxRetry:      8,
 							}).Run()
 							if err != nil {
 								logger.Error("set image backoff failed", "err", err)

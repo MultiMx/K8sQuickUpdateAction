@@ -32,7 +32,7 @@ func New(c Conf) Backoff {
 
 	return Backoff{
 		c:          c,
-		retryDelay: time.Second * 2,
+		retryDelay: time.Second,
 	}
 }
 
