@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/MultiMx/K8sQuickUpdateAction/internal/config"
+	"github.com/MultiMx/K8sQuickUpdateAction/pkg/backoff"
 	"github.com/MultiMx/K8sQuickUpdateAction/pkg/kube"
 	"log/slog"
 	"os"
@@ -44,10 +45,21 @@ func UpdateWorkloads() {
 								slog.String("workload", operator.Workload),
 							)
 
-							err := operator.SetImage(conf.Image)
+							err := backoff.New(backoff.Conf{
+								Logger: logger.With("action", "set image"),
+								Content: func() error {
+									err := operator.SetImage(conf.Image)
+									if err != nil {
+										errCount.Add(1)
+										logger.Warn("set image failed", "err", err)
+									}
+									return err
+								},
+								MaxRetryDelay: 0,
+								MaxRetry:      0,
+							}).Run()
 							if err != nil {
-								errCount.Add(1)
-								logger.Error("set image failed", "err", err)
+								logger.Error("set image backoff failed", "err", err)
 								return
 							}
 

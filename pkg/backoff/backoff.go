@@ -16,7 +16,8 @@ type Backoff struct {
 }
 
 type Conf struct {
-	Name    string
+	Logger *slog.Logger
+
 	Content func() error
 	// 最大重试等待时间
 	MaxRetryDelay time.Duration
@@ -25,12 +26,6 @@ type Conf struct {
 }
 
 func New(c Conf) Backoff {
-	if c.Name == "" {
-		c.Name = "UNKNOWN"
-	}
-	if c.Content == nil {
-		panic("content function required")
-	}
 	if c.MaxRetryDelay == 0 {
 		c.MaxRetryDelay = time.Minute * 20
 	}
@@ -41,13 +36,9 @@ func New(c Conf) Backoff {
 	}
 }
 
-func (a Backoff) Start() {
-	go a.Worker()
-}
-
-// Worker
+// Run
 // 请注意,此处使用的是普通接收器,当 worker 重新运行时参数会被重置
-func (a Backoff) Worker() {
+func (a Backoff) Run() error {
 	quitAfterCount := a.c.MaxRetry != 0
 
 	for {
@@ -66,16 +57,12 @@ func (a Backoff) Worker() {
 
 		if quitAfterCount {
 			if a.c.MaxRetry == 0 {
-				slog.Error("backoff deadline reached",
-					slog.String("name", a.c.Name),
-				)
-				break
+				return errors.New("backoff deadline reached")
 			}
 			a.c.MaxRetry--
 		}
 
-		slog.Info("backoff retry...",
-			slog.String("name", a.c.Name),
+		a.c.Logger.Info("backoff retry...",
 			slog.Duration("wait", a.retryDelay),
 		)
 
@@ -88,4 +75,6 @@ func (a Backoff) Worker() {
 			}
 		}
 	}
+
+	return nil
 }
