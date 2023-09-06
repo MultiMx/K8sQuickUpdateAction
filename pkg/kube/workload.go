@@ -34,7 +34,7 @@ func (a Workload) SetImage(image string) error {
 	return nil
 }
 
-func (a Workload) DeploymentFullAvailable() (bool, error) {
+func (a Workload) FullAvailable() (bool, error) {
 	res, err := a.kube.Request("GET", &Request{
 		Url: a.DeploymentUrl(),
 	})
