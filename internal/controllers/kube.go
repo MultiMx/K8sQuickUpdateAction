@@ -36,7 +36,9 @@ func UpdateWorkloads() {
 		var chain *DeployWorkChain
 		for namespace, workloads := range step {
 			for workload, conf := range workloads {
+				conf := conf
 				for _, kubeApi := range apis {
+					kubeApi := kubeApi
 					wg.Add(1)
 					operator := kubeApi.NewWorkload(namespace, workload)
 					var deployWork = DeployWorkChain{
