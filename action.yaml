@@ -1,0 +1,13 @@
+name: Rancher Quick Set Deployment Image Action
+description: >
+  Quickly Set K8s Deployment Image
+inputs:
+  k8s:
+    description: 'k8s credentials'
+    required: true
+  workloads:
+    description: 'target workloads'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
