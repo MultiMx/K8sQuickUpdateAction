@@ -75,6 +75,8 @@ func UpdateWorkloads() {
 									return
 								}
 							}
+
+							logger.Info("success")
 						},
 					}
 					chain = &deployWork
