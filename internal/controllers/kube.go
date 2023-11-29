@@ -56,7 +56,6 @@ func UpdateWorkloads() {
 								Content: func() error {
 									err := operator.SetImage(conf.Image)
 									if err != nil {
-										errCount.Add(1)
 										logger.Warn("set image failed", "err", err)
 									}
 									return err
@@ -65,6 +64,7 @@ func UpdateWorkloads() {
 								MaxRetry:      8,
 							}).Run()
 							if err != nil {
+								errCount.Add(1)
 								logger.Error("set image backoff failed", "err", err)
 								return
 							}
